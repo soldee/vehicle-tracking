@@ -14,15 +14,17 @@ public class VehicleModel {
     private boolean active;
     private float latitude;
     private float longitude;
-    private Date lastTimestamp;
+    private Date timestamp;
+    private String URL;
 
-    public VehicleModel(ObjectId objectId, String vehicleName, boolean active, float latitude, float longitude, Date lastTimestamp) {
+    public VehicleModel(ObjectId objectId, String vehicleName, boolean active, float latitude, float longitude, Date timestamp, String url) {
         this.objectId = objectId;
         this.vehicleName = vehicleName;
         this.active = active;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.lastTimestamp = lastTimestamp;
+        this.timestamp = timestamp;
+        URL = url;
     }
 
     public String toJSONString() {
@@ -76,10 +78,18 @@ public class VehicleModel {
     }
 
     public Date getLastTimestamp() {
-        return lastTimestamp;
+        return timestamp;
     }
 
-    public void setLastTimestamp(Date lastTimestamp) {
-        this.lastTimestamp = lastTimestamp;
+    public void setLastTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getURL() {
+        return URL;
+    }
+
+    public void setURL(String URL) {
+        this.URL = URL;
     }
 }
