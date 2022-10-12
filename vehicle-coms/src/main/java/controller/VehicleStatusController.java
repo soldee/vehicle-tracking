@@ -3,7 +3,6 @@ package controller;
 import constants.VehicleConstants;
 import dto.VehicleAllStatusDto;
 import dto.VehicleStatusDto;
-import exceptions.VehicleNotFoundException;
 import exceptions.VehicleComsException;
 import model.VehicleModel;
 import org.json.JSONObject;
@@ -47,7 +46,7 @@ public class VehicleStatusController {
             VehicleStatusDto status = vehicleStatusService.getStatus(vehicleId);
             return new JSONObject()
                     .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
-                    .append(VehicleConstants.RESPONSE, status)
+                    .append(VehicleConstants.RESPONSE, status.toJSONString())
                     .toString();
 
         } catch (Exception e) {
@@ -62,12 +61,13 @@ public class VehicleStatusController {
 
     
     @GetMapping(path = "/status/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String allStatus() {
+    public String allStatus(@RequestParam(required = false) Boolean getInactive) {
+        if (getInactive == null) getInactive = true;
         try {
-            VehicleAllStatusDto status = vehicleStatusService.getAllstatus();
+            VehicleAllStatusDto status = vehicleStatusService.getAllstatus(getInactive);
             return new JSONObject()
                     .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
-                    .append(VehicleConstants.RESPONSE, status)
+                    .append(VehicleConstants.RESPONSE, status.toJSONString())
                     .toString();
 
         } catch (Exception e) {

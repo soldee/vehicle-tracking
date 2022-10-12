@@ -17,6 +17,7 @@ public class VehicleController {
     @Autowired
     private VehicleControlService vehicleControlService;
 
+
     @GetMapping(path = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
     public String start(@RequestParam String vehicleId) {
         try {

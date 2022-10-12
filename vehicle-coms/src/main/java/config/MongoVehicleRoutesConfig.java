@@ -6,7 +6,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
-import model.VehicleModel;
+import model.RouteModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +19,7 @@ import java.util.Collections;
 
 
 @Configuration
-public class MongoVehicleActionsConfig {
+public class MongoVehicleRoutesConfig {
 
     @Value("mongo.vehicleActions.db")
     private String db;
@@ -41,7 +41,7 @@ public class MongoVehicleActionsConfig {
 
 
 
-    @Bean(name = "vehicleActionsMongoClient")
+    @Bean(name = "vehicleRoutesMongoClient")
     public MongoClient mongoClient() {
 
         MongoCredential credential = MongoCredential
@@ -54,20 +54,20 @@ public class MongoVehicleActionsConfig {
                 .build());
     }
 
-    @Bean(name = "vehiclesMongoCollection")
-    public MongoCollection<VehicleModel> mongoCollection(
+    @Bean(name = "vehicleRoutesMongoCollection")
+    public MongoCollection<RouteModel> mongoCollection(
             @Qualifier("vehiclesMongoClient") MongoClient mongoClient) {
-        return mongoClient.getDatabase(db).getCollection(collection, VehicleModel.class);
+        return mongoClient.getDatabase(db).getCollection(collection, RouteModel.class);
     }
 
-    @Bean(name = "vehicleActionsMongoFactory")
+    @Bean(name = "vehicleRoutesMongoFactory")
     public MongoDatabaseFactory mongoDatabaseFactory(
             @Qualifier("vehicleActionsMongoClient") MongoClient mongoClient) {
         return new SimpleMongoClientDatabaseFactory(mongoClient, db);
     }
 
-    @Bean(name = "vehicleActionsMongoTemplate")
-    public MongoTemplate mongoTemplate(@Qualifier("vehiclesMongoFactory") MongoDatabaseFactory mongoDatabaseFactory) {
+    @Bean(name = "vehicleRoutesMongoTemplate")
+    public MongoTemplate mongoTemplate(@Qualifier("vehicleRoutesMongoFactory") MongoDatabaseFactory mongoDatabaseFactory) {
         return new MongoTemplate(mongoDatabaseFactory);
     }
 

@@ -1,6 +1,10 @@
 package dto;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class VehicleAllStatusDto {
 
@@ -9,6 +13,12 @@ public class VehicleAllStatusDto {
 
     public VehicleAllStatusDto(ArrayList<VehicleStatusDto> vehicleStatusDtos) {
         this.vehicleStatusDtos = vehicleStatusDtos;
+    }
+
+    public String toJSONString() {
+        return new JSONObject()
+                .append("status", new JSONArray(vehicleStatusDtos))
+                .toString();
     }
 
     public ArrayList<VehicleStatusDto> getVehicleStatuses() {

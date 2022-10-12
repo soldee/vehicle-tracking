@@ -14,7 +14,10 @@ public class VehicleConstants {
     public final static String LONGITUDE = "longitude";
     public final static String TIMESTAMP = "timestamp";
 
-    // Vehicle control
+    // Vehicle control/actions
     public final static String START = "START";
     public final static String STOP = "STOP";
+
+
+    public final static String ROUTE_ID= "route_id";
 }
