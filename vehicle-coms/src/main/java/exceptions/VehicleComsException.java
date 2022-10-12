@@ -1,10 +1,10 @@
 package exceptions;
 
-public class VehicleTrackingException extends Exception {
+public class VehicleComsException extends Exception {
     private int code;
     private String message;
 
-    public VehicleTrackingException(int code, String message) {
+    public VehicleComsException(int code, String message) {
 
     }
 

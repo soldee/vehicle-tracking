@@ -29,11 +29,13 @@ public class VehicleModel {
 
     public String toJSONString() {
         return new JSONObject()
-                .append("vehicle_id", objectId)
+                .append("vehicle_id", objectId.toString())
                 .append("vehicle_name", vehicleName)
                 .append("active", active)
                 .append("latitude", latitude)
                 .append("longitude", longitude)
+                .append("timestamp", timestamp)
+                .append("url", URL)
                 .toString();
     }
 

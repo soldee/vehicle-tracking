@@ -1,29 +1,33 @@
 package controller;
 
 import constants.VehicleConstants;
+import dto.VehicleAllStatusDto;
+import dto.VehicleStatusDto;
+import exceptions.VehicleNotFoundException;
 import exceptions.VehicleComsException;
+import model.VehicleModel;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import services.VehicleControlService;
+import services.VehicleStatusService;
 
 
 @RestController
-public class VehicleController {
+public class VehicleStatusController {
 
     @Autowired
-    private VehicleControlService vehicleControlService;
+    private VehicleStatusService vehicleStatusService;
 
-    @GetMapping(path = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String start(@RequestParam String vehicleId) {
+    @GetMapping(path = "/info", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String info(@RequestParam String vehicleId) {
         try {
-            boolean start = vehicleControlService.startVehicle(vehicleId);
+            VehicleModel vehicle = vehicleStatusService.getVehicle(vehicleId);
             return new JSONObject()
                     .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
-                    .append(VehicleConstants.RESPONSE, start)
+                    .append(VehicleConstants.RESPONSE, vehicle.toJSONString())
                     .toString();
 
         } catch (Exception e) {
@@ -37,13 +41,13 @@ public class VehicleController {
     }
 
 
-    @GetMapping(path = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String stop(@RequestParam String vehicleId) {
+    @GetMapping(path = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String status(@RequestParam String vehicleId) {
         try {
-            boolean start = vehicleControlService.stopVehicle(vehicleId);
+            VehicleStatusDto status = vehicleStatusService.getStatus(vehicleId);
             return new JSONObject()
                     .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
-                    .append(VehicleConstants.RESPONSE, start)
+                    .append(VehicleConstants.RESPONSE, status)
                     .toString();
 
         } catch (Exception e) {
@@ -55,4 +59,25 @@ public class VehicleController {
                     .toString();
         }
     }
+
+    
+    @GetMapping(path = "/status/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String allStatus() {
+        try {
+            VehicleAllStatusDto status = vehicleStatusService.getAllstatus();
+            return new JSONObject()
+                    .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
+                    .append(VehicleConstants.RESPONSE, status)
+                    .toString();
+
+        } catch (Exception e) {
+            return new JSONObject()
+                    .append(VehicleConstants.CODE, VehicleConstants.UNKNOWN_ERROR_CODE)
+                    .append(VehicleConstants.ERROR_MESSAGE, e.getMessage())
+                    .toString();
+        }
+    }
+
+
+
 }

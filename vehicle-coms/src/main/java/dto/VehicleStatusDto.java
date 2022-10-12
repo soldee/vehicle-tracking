@@ -3,11 +3,11 @@ package dto;
 public class VehicleStatusDto {
 
     private String vehicleId;
-    private float latitude;
-    private float longitude;
+    private Float latitude;
+    private Float longitude;
     private String timestamp;
 
-    public VehicleStatusDto(String vehicleId, float latitude, float longitude, String timestamp) {
+    public VehicleStatusDto(String vehicleId, Float latitude, Float longitude, String timestamp) {
         this.vehicleId = vehicleId;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -30,11 +30,11 @@ public class VehicleStatusDto {
         this.vehicleId = vehicleId;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
     }
 
