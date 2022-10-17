@@ -8,14 +8,15 @@ public class RouteModel {
     private String vehicleId;
     private Date timestamp;
     private String route_id;
+    private String user_id;
 
-    public RouteModel(String action, String vehicleId, Date timestamp) {
+    public RouteModel(String action, String vehicleId, Date timestamp, String user_id) {
         this.action = action;
         this.vehicleId = vehicleId;
         this.timestamp = timestamp;
     }
 
-    public RouteModel(String action, String vehicleId, Date timestamp, String route_id) {
+    public RouteModel(String action, String vehicleId, Date timestamp, String user_id, String route_id) {
         this.action = action;
         this.vehicleId = vehicleId;
         this.timestamp = timestamp;
@@ -44,5 +45,13 @@ public class RouteModel {
 
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getRoute_id() {
+        return route_id;
+    }
+
+    public void setRoute_id(String route_id) {
+        this.route_id = route_id;
     }
 }

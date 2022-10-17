@@ -33,23 +33,23 @@ public class VehicleControlService {
     private MongoCollection<RouteModel> vehicleRoutesCollection;
 
 
-    public boolean startVehicle(String vehicleId) throws VehicleNotFoundException, VehicleRequestException {
+    public boolean startVehicle(String vehicleId, String user_id) throws VehicleNotFoundException, VehicleRequestException {
         VehicleModel vehicle = statusService.getVehicle(vehicleId);
         if(vehicle == null) throw new VehicleNotFoundException();
 
         boolean hasStarted = vehicleStartRequest(vehicle.getURL(), vehicle.getObjectId().toString());
         if (hasStarted) vehicleRoutesCollection.insertOne(
-                new RouteModel(VehicleConstants.START, vehicleId, new Date(System.currentTimeMillis())));
+                new RouteModel(VehicleConstants.START, vehicleId, new Date(System.currentTimeMillis()), user_id));
         return hasStarted;
     }
 
-    public boolean stopVehicle(String vehicleId) throws VehicleNotFoundException, VehicleRequestException {
+    public boolean stopVehicle(String vehicleId, String user_id) throws VehicleNotFoundException, VehicleRequestException {
         VehicleModel vehicle = statusService.getVehicle(vehicleId);
         if(vehicle == null) throw new VehicleNotFoundException();
         
         String route_id = vehicleStopRequest(vehicle.getURL());
         vehicleRoutesCollection.insertOne(
-                new RouteModel(VehicleConstants.STOP, vehicleId, new Date(System.currentTimeMillis()), route_id));
+                new RouteModel(VehicleConstants.STOP, vehicleId, new Date(System.currentTimeMillis()), user_id, route_id));
         return true;
     }
 

@@ -19,9 +19,9 @@ public class VehicleController {
 
 
     @GetMapping(path = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String start(@RequestParam String vehicleId) {
+    public String start(@RequestParam String vehicleId, @RequestParam String user_id) {
         try {
-            boolean start = vehicleControlService.startVehicle(vehicleId);
+            boolean start = vehicleControlService.startVehicle(vehicleId, user_id);
             return new JSONObject()
                     .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
                     .append(VehicleConstants.RESPONSE, start)
@@ -39,12 +39,12 @@ public class VehicleController {
 
 
     @GetMapping(path = "/stop", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String stop(@RequestParam String vehicleId) {
+    public String stop(@RequestParam String vehicleId, @RequestParam String user_id) {
         try {
-            boolean start = vehicleControlService.stopVehicle(vehicleId);
+            boolean stop = vehicleControlService.stopVehicle(vehicleId, user_id);
             return new JSONObject()
                     .append(VehicleConstants.CODE, VehicleConstants.OK_CODE)
-                    .append(VehicleConstants.RESPONSE, start)
+                    .append(VehicleConstants.RESPONSE, stop)
                     .toString();
 
         } catch (Exception e) {
