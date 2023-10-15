@@ -112,7 +112,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
     command: mongod --replSet rs0 --bind_ip localhost,mongo --keyFile /opt/rs-keyfile
     healthcheck:
-      test: mongo -u root -p root --eval 'print('')' || exit -1
+      test: mongosh -u root -p root --eval 'print('')' || exit -1
       start_period: 15s
       interval: 5s
       timeout: 10s
@@ -126,7 +126,7 @@ services:
     networks:
       - mongo-net
     command: >
-      mongo --host mongo:27017 -u root -p root --eval "
+      mongosh --host mongo:27017 -u root -p root --eval "
         rs.initiate({
           _id: 'rs0',
           members: [

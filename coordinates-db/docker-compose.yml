@@ -1,7 +1,9 @@
 version: "3"
 services:
   mongo:
-    image: 'mongo-nc:latest' 
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: mongo 
     ports:
       - '27017:27017'
@@ -12,37 +14,27 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
     command: mongod --replSet rs0 --bind_ip localhost,mongo --keyFile /opt/rs-keyfile
     healthcheck:
-      test: nc -z localhost 27017 || exit -1
+      test: mongosh -u root -p root --eval 'print('')' || exit -1
       start_period: 15s
       interval: 5s
       timeout: 10s
       retries: 10   
 
   mongo-init:
-    image: 'mongo-nc:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile 
     container_name: mongo-init
     networks:
       - mongo_network
     command: >
-      mongo --host mongo:27017 -u root -p root --eval "
+      mongosh --host mongo:27017 -u root -p root --eval "
         rs.initiate({
           _id: 'rs0',
           members: [
             {_id:0, host: 'mongo'},
           ]
-        });
-        
-        while (rs.status().ok == 0) sleep(1000);
-
-        db = db.getSiblingDB('admin');
-
-        sleep(100); 
-
-        db.createUser({
-          user: 'ingest',
-          pwd: 'ingest',
-          roles: [ {role: 'readWrite', db:'VEHICLE-TRACKING'} ]
-        });"    
+        });"      
     
     depends_on:
       mongo:
