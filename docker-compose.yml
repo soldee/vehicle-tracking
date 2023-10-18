@@ -70,7 +70,9 @@ services:
       retries: 10
   
   kconnect:
-    image: confluentinc/cp-kafka-connect:7.3.5
+    build:
+      context: ./vehicle-tracker-kafka
+      dockerfile: Dockerfile-kconnect
     hostname: kconnect
     container_name: kconnect
     depends_on:
@@ -97,6 +99,17 @@ services:
     networks:
       - tracker-net
 
+  kconnect-init:
+    build:
+      context: ./vehicle-tracker-kafka
+      dockerfile: Dockerfile-kconnect-init
+    container_name: kconnect-init
+    depends_on:
+      kconnect:
+        condition: service_healthy
+    networks:
+      - tracker-net
+
   mongo:
     build:
       context: coordinates-db
@@ -110,7 +123,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-    command: mongod --replSet rs0 --bind_ip localhost,mongo --keyFile /opt/rs-keyfile
+    command: mongod --replSet rs0 --bind_ip 0.0.0.0 --keyFile /opt/rs-keyfile
     healthcheck:
       test: mongosh -u root -p root --eval 'print('')' || exit -1
       start_period: 15s
@@ -138,7 +151,7 @@ services:
        " 
     depends_on:
       mongo:
-        condition: service_healthy
+        condition: service_healthy 
 
 networks:
     tracker-net:
