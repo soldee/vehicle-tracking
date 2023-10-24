@@ -1,3 +1,6 @@
 */.idea/*
 */target
 .idea
+*/vendor/*
+*/.env
+*/*.exe
