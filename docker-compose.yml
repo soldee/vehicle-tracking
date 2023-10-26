@@ -134,28 +134,13 @@ services:
   mongo-init:
     build:
       context: coordinates-db
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile-mongo-init
     container_name: mongo-init
     networks:
       - mongo-net
-    command: >
-      mongosh --host mongo:27017 -u root -p root --eval "
-        rs.initiate({
-          _id: 'rs0',
-          members: [
-            {_id:0, host: 'mongo'},
-          ]
-        });
-          
-        while (rs.status().ok == 0) sleep(1000);
-
-        db.getCollection('vehicle-status').createIndex({'meta.vehicle_id':1, 'ts':-1});
-        db.getCollection('vehicle-status').createIndex({'meta.route_id':1});
-        db.getCollection('vehicle-status').createIndex({'meta.user_id':1, 'ts':-1});
-       "
     depends_on:
       mongo:
-        condition: service_healthy 
+        condition: service_healthy
 
 networks:
     tracker-net:

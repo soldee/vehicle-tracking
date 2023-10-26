@@ -23,19 +23,10 @@ services:
   mongo-init:
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile-mongo-init
     container_name: mongo-init
     networks:
       - mongo_network
-    command: >
-      mongosh --host mongo:27017 -u root -p root --eval "
-        rs.initiate({
-          _id: 'rs0',
-          members: [
-            {_id:0, host: 'mongo'},
-          ]
-        });"      
-    
     depends_on:
       mongo:
         condition: service_healthy

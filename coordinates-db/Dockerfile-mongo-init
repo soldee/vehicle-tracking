@@ -1,0 +1,3 @@
+FROM mongo:7.0
+COPY --chmod=111 ./mongo-init-entrypoint.sh ./mongo-init-entrypoint.sh
+CMD ["/bin/sh", "-c", "./mongo-init-entrypoint.sh"]
