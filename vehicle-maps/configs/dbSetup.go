@@ -1,34 +1,32 @@
 package configs
 
 import (
-    "context"
-    "log"
-    "time"
+	"context"
+	"log"
 	"os"
+	"time"
+
 	"github.com/joho/godotenv"
-    "go.mongodb.org/mongo-driver/mongo"
-    "go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func DBInstance() *mongo.Client {
 
 	godotenv.Load(".env")
-	uri := os.Getenv("MONGODB_URI");
-	if (uri == "") {
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
 		log.Fatal("MONGODB_URI env variable not found")
 	}
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
-	if err != nil {
-		log.Fatal(err)
-	}
+	options := options.Client().ApplyURI(uri)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	//defer cancel()
 
-	err = client.Connect(ctx)
+	client, err := mongo.Connect(ctx, options)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error connecting to MongoDB: %v", err)
 	}
 
 	return client
