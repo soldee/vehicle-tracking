@@ -1,6 +1,10 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Metadata struct {
 	VehicleId primitive.ObjectID `bson:"vehicle_id"`
@@ -19,4 +23,15 @@ type Status struct {
 	Metadata  Metadata           `bson:"meta"`
 	Location  Location           `bson:"location"`
 	Speed     float32            `bson:"speed"`
+}
+
+type Coordinates struct {
+	Coordinates [][]float64 `bson:"coordinates"`
+	Timestamp   []time.Time `bson:"ts"`
+}
+
+type CoordinatesResponse struct {
+	RouteId     string      `json:"route_id"`
+	Coordinates [][]float64 `json:"coordinates"`
+	Timestamp   []time.Time `json:"ts"`
 }

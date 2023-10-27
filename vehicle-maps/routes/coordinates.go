@@ -3,10 +3,10 @@ package routes
 import (
 	"context"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 	"vehicle-maps/configs"
+	"vehicle-maps/models"
 	"vehicle-maps/response"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -34,22 +34,27 @@ func GetStatusByRouteId(w http.ResponseWriter, r *http.Request) {
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "_id", Value: 0},
+		}}},
 	})
 	if err != nil {
-		log.Println(err)
 		response.HandleErrorResponse(w, 503, err)
 		return
 	}
 
-	var results []bson.M
+	var results []models.Coordinates
 	if err = cursor.All(ctx, &results); err != nil {
 		response.HandleErrorResponse(w, 503, err)
 		return
 	}
 
-	for _, result := range results {
-		log.Println(result)
+	result := results[0]
+	responseData := models.CoordinatesResponse{
+		RouteId:     routeID,
+		Coordinates: result.Coordinates,
+		Timestamp:   result.Timestamp,
 	}
 
-	w.WriteHeader(200)
+	response.HandleJsonResponse(w, http.StatusOK, responseData)
 }
