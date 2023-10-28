@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 	"vehicle-maps/configs"
@@ -49,12 +50,15 @@ func GetStatusByRouteId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result := results[0]
-	responseData := models.CoordinatesResponse{
-		RouteId:     routeID,
-		Coordinates: result.Coordinates,
-		Timestamp:   result.Timestamp,
+	if len(results) == 0 {
+		response.HandleErrorResponse(w, http.StatusNotFound, fmt.Errorf("route_id not found: %v", routeID))
+	} else {
+		result := results[0]
+		responseData := models.CoordinatesResponse{
+			RouteId:     routeID,
+			Coordinates: result.Coordinates,
+			Timestamp:   result.Timestamp,
+		}
+		response.HandleJsonResponse(w, http.StatusOK, responseData)
 	}
-
-	response.HandleJsonResponse(w, http.StatusOK, responseData)
 }
