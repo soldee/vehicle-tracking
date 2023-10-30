@@ -2,7 +2,8 @@ import React from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet'
-import Coordinates from './Coordinates';
+import Route from './Route';
+import MapFeatures from './MapFeatures';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -15,7 +16,7 @@ L.Icon.Default.mergeOptions({
 
 function LeafletMap() {
 
-    const center = [41.389260,2.131592];
+    const center = window.REACT_APP_MAP_CENTER;
 
     return (
         <div className="map-container">
@@ -25,7 +26,7 @@ function LeafletMap() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <Coordinates />
+                <MapFeatures />
             </MapContainer>
         </div>
     );

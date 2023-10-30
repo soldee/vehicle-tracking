@@ -1,0 +1,2 @@
+window.REACT_APP_DOMAIN="http://localhost:8000";
+window.REACT_APP_MAP_CENTER=[41.389260,2.131592];

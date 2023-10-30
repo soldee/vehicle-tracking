@@ -1,9 +1,15 @@
 import React from 'react';
 import { Marker, Popup, Polyline, FeatureGroup, useMap } from 'react-leaflet';
 
-function Coordinates() {
+function Route({coordinates, route_id, color}) {
 
     const map = useMap()
+
+    const vehicle_coordinates = coordinates.slice(-1).pop();
+    const route_options = {
+        weight: 6,
+        color: color
+    }
 
 
     function onFeatureGroupClick(e) {
@@ -19,33 +25,19 @@ function Coordinates() {
         })
     }
 
-
-    function renderCoordinates() {
-        const route_coordinates = [[41.388477,2.128103], [41.389157,2.130848], [41.389260,2.131592]]
-        const vehicle_coordinates = route_coordinates.slice(-1).pop();
-        const route_options = {
-            weight: 6,
-            color: "#0fff"
-        }
-
-        return (
+    return (
+        <React.Fragment>
             <FeatureGroup eventHandlers={{ click: onFeatureGroupClick }} >
                 <Marker position={vehicle_coordinates} type='vehicle' >
                     <Popup>
-                        A pretty CSS3 popup. <br /> Easily customizable.
+                        Route Id: {route_id}
                     </Popup>
                 </Marker>
-                <Polyline positions={route_coordinates} pathOptions={route_options} type='route' />
+                <Polyline positions={coordinates} pathOptions={route_options} type='route' />
             </FeatureGroup>
-        )
-    }
-
-    return (
-        <div>
-            {renderCoordinates()}
-        </div>
+        </React.Fragment>
     )
 
 }
 
-export default Coordinates;
+export default Route;
