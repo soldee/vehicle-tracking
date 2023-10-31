@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 	"vehicle-maps/configs"
-	"vehicle-maps/models"
 	"vehicle-maps/response"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,12 +30,19 @@ func GetStatusByRouteId(w http.ResponseWriter, r *http.Request) {
 			{Key: "meta.route_id", Value: routeID},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: "null"},
+			{Key: "_id", Value: bson.D{
+				{Key: "route_id", Value: "$meta.route_id"},
+				{Key: "vehicle_id", Value: "$meta.vehicle_id"},
+			}},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
+			{Key: "route_id", Value: "$_id.route_id"},
+			{Key: "vehicle_id", Value: "$_id.vehicle_id"},
+			{Key: "coordinates", Value: 1},
+			{Key: "ts", Value: 1},
 		}}},
 	})
 	if err != nil {
@@ -44,7 +50,7 @@ func GetStatusByRouteId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var results []models.Coordinates
+	var results []bson.M
 	if err = cursor.All(ctx, &results); err != nil {
 		response.HandleErrorResponse(w, 503, err)
 		return
@@ -52,13 +58,7 @@ func GetStatusByRouteId(w http.ResponseWriter, r *http.Request) {
 
 	if len(results) == 0 {
 		response.HandleErrorResponse(w, http.StatusNotFound, fmt.Errorf("route_id not found: %v", routeID))
-	} else {
-		result := results[0]
-		responseData := models.CoordinatesResponse{
-			RouteId:     routeID,
-			Coordinates: result.Coordinates,
-			Timestamp:   result.Timestamp,
-		}
-		response.HandleJsonResponse(w, http.StatusOK, responseData)
+		return
 	}
+	response.HandleJsonResponse(w, http.StatusOK, results[0])
 }
