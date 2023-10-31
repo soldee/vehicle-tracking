@@ -14,7 +14,7 @@ L.Icon.Default.mergeOptions({
 })
 
 
-function LeafletMap() {
+function LeafletMap({ data }) {
 
     const center = window.REACT_APP_MAP_CENTER;
 
@@ -26,7 +26,7 @@ function LeafletMap() {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
 
-                <MapFeatures />
+                <MapFeatures data={data} />
             </MapContainer>
         </div>
     );

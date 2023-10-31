@@ -1,7 +1,7 @@
 import React from 'react';
 import { Marker, Popup, Polyline, FeatureGroup, useMap } from 'react-leaflet';
 
-function Route({coordinates, route_id, color}) {
+function Route({vehicle_id, coordinates, route_id, color}) {
 
     const map = useMap()
 
@@ -30,7 +30,10 @@ function Route({coordinates, route_id, color}) {
             <FeatureGroup eventHandlers={{ click: onFeatureGroupClick }} >
                 <Marker position={vehicle_coordinates} type='vehicle' >
                     <Popup>
-                        Route Id: {route_id}
+                        <dl>
+                            <dt><b>Vehicle ID</b> {vehicle_id}</dt>
+                            <dt><b>Route ID</b> {route_id}</dt>
+                        </dl>
                     </Popup>
                 </Marker>
                 <Polyline positions={coordinates} pathOptions={route_options} type='route' />

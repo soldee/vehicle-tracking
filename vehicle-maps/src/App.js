@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import LeafletMap from './pages/map/LeafletMap';
 import RouteForm from './pages/map/RouteForm';
 
 export default function App() { 
 
-    function searchRouteHandler(data) {
-        const coordinates = data.coordinates;
-        const route_id = data.route_id;
+    const [vehiclesData, setVehiclesData] = useState([])
 
-        console.log(coordinates, route_id)
+    function searchRouteHandler(json) {
+        const data = [json]
+        setVehiclesData(data)
     }
 
     return (
         <div className="App">
-        <LeafletMap />
+        <LeafletMap data={vehiclesData} />
         <RouteForm onSearchRouteId={searchRouteHandler} />
         </div>
     );
