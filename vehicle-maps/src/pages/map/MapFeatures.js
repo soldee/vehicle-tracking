@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Route from "./Route";
 
-export default function MapFeatures({ data }) {
+export default function MapFeatures({ data, features }) {
 
     const [isLoading, setIsLoading] = useState(true);
     const [vehicle, setVehicle] = useState(null);
@@ -34,7 +34,8 @@ export default function MapFeatures({ data }) {
                         coordinates={vehicle.coordinates} 
                         vehicle_id={vehicle.vehicle_id} 
                         route_id={vehicle.route_id} 
-                        color="#0fff" 
+                        color="#0fff"
+                        route_points_toggled={features.route_points_toggled}
                     />
                 })
             }

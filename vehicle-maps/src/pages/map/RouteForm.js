@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function RouteForm({ onSearchRouteId }) {
+export default function RouteForm({ onSearchRouteId, mapFeatures, onMapFeaturesChange }) {
 
     function handleSubmit(e) {
         e.preventDefault()
@@ -27,6 +27,19 @@ export default function RouteForm({ onSearchRouteId }) {
             })
     }
 
+
+    function handleMapFeatureChange(type, change) {
+        switch(type){
+            case "route_points_toggled":
+                mapFeatures[type] = change
+                onMapFeaturesChange(mapFeatures)
+                break;
+            default:
+                break;
+        }
+    }
+
+
     return (
         <React.Fragment>
             <form method="GET" onSubmit={handleSubmit}>
@@ -36,6 +49,13 @@ export default function RouteForm({ onSearchRouteId }) {
                 </label>
                 <button type="submit">Search</button>
             </form>
+            <label>
+                Toggle route points
+                <input 
+                    type="checkbox"
+                    onChange={(e) => handleMapFeatureChange("route_points_toggled", e.target.checked)} 
+                />
+            </label>
         </React.Fragment>
     );
 }

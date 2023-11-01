@@ -1,7 +1,10 @@
 import React from 'react';
 import { Marker, Popup, Polyline, FeatureGroup, useMap } from 'react-leaflet';
+import marker from '../../assets/black-route-point.png'
+import L from 'leaflet'
 
-function Route({vehicle_id, coordinates, route_id, color}) {
+
+function Route({vehicle_id, coordinates, route_id, color, route_points_toggled}) {
 
     const map = useMap()
 
@@ -10,6 +13,12 @@ function Route({vehicle_id, coordinates, route_id, color}) {
         weight: 6,
         color: color
     }
+
+    const pointsIcon = new L.Icon({
+        iconUrl: marker,
+        iconRetinaUrl: marker,
+        iconSize: window.ROUTE_POINTS_ICON_SIZE
+    })
 
 
     function onFeatureGroupClick(e) {
@@ -37,6 +46,12 @@ function Route({vehicle_id, coordinates, route_id, color}) {
                     </Popup>
                 </Marker>
                 <Polyline positions={coordinates} pathOptions={route_options} type='route' />
+                {
+                    route_points_toggled &&
+                    coordinates.map(c => {
+                        return <Marker key={c} position={c} icon={pointsIcon}></Marker>
+                    })
+                }
             </FeatureGroup>
         </React.Fragment>
     )
