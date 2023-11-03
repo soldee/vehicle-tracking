@@ -41,7 +41,7 @@ export default function RouteForm({ onSearchRouteId, mapFeatures, onMapFeaturesC
 
 
     return (
-        <React.Fragment>
+        <div className="features-form-container">
             <form method="GET" onSubmit={handleSubmit}>
                 <label>
                     Route ID: 
@@ -53,9 +53,10 @@ export default function RouteForm({ onSearchRouteId, mapFeatures, onMapFeaturesC
                 Toggle route points
                 <input 
                     type="checkbox"
+                    checked={mapFeatures.route_points_toggled}
                     onChange={(e) => handleMapFeatureChange("route_points_toggled", e.target.checked)} 
                 />
             </label>
-        </React.Fragment>
+        </div>
     );
 }
