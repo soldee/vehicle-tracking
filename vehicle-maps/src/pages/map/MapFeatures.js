@@ -11,6 +11,7 @@ export default function MapFeatures({ mapFeatures, onMapFeaturesChange }) {
 
     return (
         <div className="features-container">
+            <span className="material-symbols-outlined settings">settings</span>
             <label>
                 <p>Toggle route points</p>
                 <input 
