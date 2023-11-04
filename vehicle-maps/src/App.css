@@ -5,73 +5,9 @@
   flex-direction: column;
 }
 
-.map-container {
-  width: 100%;
-  height: 100%;
-  padding: 1px;
-}
-
-.leaflet-container {
-  height: 100%;
-  width: 100%;
-  border-radius: 10px;
-}
-
-.tab-buttons {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-  gap: 20px;
-}
-
-.tab-buttons button {
-  color: #000000;
-  background: #a8c5d8;
-  border: none;
-  border-radius: 25px;
-  padding: 5px 15px;
-  margin: 0 5px;
-  cursor: pointer;
-  transition: background-color 0.4s;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 5px;
-}
-
-
-.tab-buttons button.active {
-  background-color: #3498db;
-}
-
-.tab-buttons button:hover {
-  background-color: #88b7d6;
-}
-.tab-buttons button.active:hover {
-  background-color: #3498db;
-}
-
 .tab-content {
   padding: 5px;
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.features-form-container {
-  display: flex;
-  margin: 10px;
-  gap: 50px;
-  border: 1px solid #3498db;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-.material-symbols-outlined.radio { 
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  color: #da0606;
-}
-
-.material-symbols-outlined.filter { 
-  font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 200, 'opsz' 48;
 }

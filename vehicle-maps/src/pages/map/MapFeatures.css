@@ -1,0 +1,18 @@
+.features-container {
+    display: flex;
+    flex-direction: row;
+    width: min-content;
+    white-space: nowrap;
+
+    margin: 10px;
+    gap: 30px;
+    border: 1px solid #3498db;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+}
+
+.features-container label {
+    display: flex;
+    flex-direction: row;
+}
