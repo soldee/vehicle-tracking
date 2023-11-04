@@ -4,7 +4,7 @@ import marker from '../../assets/black-route-point.png'
 import L from 'leaflet'
 
 
-function Route({vehicle_id, coordinates, route_id, color, route_points_toggled, focus_on_click}) {
+function Route({vehicle_id, coordinates, timestamps, route_id, color, route_points_toggled, focus_on_click}) {
 
     const map = useMap()
 
@@ -50,8 +50,19 @@ function Route({vehicle_id, coordinates, route_id, color, route_points_toggled, 
                 <Polyline positions={coordinates} pathOptions={route_options} type='route' />
                 {
                     route_points_toggled &&
-                    coordinates.map(c => {
-                        return <Marker key={c} position={c} icon={pointsIcon}></Marker>
+                    coordinates.map((c, index) => {
+                        return <Marker key={c} position={c} icon={pointsIcon} eventHandlers={{
+                            mouseover: (e) => e.target.openPopup(),
+                            mouseout: (e) => e.target.closePopup()
+                        }}>
+                            <Popup>
+                                <b>Timestamp</b> {
+                                    new Date(timestamps[index]).toLocaleDateString("es-ES", { 
+                                        weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second:'2-digit'
+                                    })
+                                }
+                            </Popup>
+                        </Marker>
                     })
                 }
             </FeatureGroup>
