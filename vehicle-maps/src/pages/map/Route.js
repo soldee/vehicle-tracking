@@ -4,7 +4,7 @@ import marker from '../../assets/black-route-point.png'
 import L from 'leaflet'
 
 
-function Route({vehicle_id, coordinates, route_id, color, route_points_toggled}) {
+function Route({vehicle_id, coordinates, route_id, color, route_points_toggled, focus_on_click}) {
 
     const map = useMap()
 
@@ -28,7 +28,9 @@ function Route({vehicle_id, coordinates, route_id, color, route_points_toggled})
                     layer.openPopup()
                     break;
                 case "route":
-                    map.fitBounds(layer.getBounds())
+                    if (focus_on_click) {
+                        map.fitBounds(layer.getBounds())
+                    }
                     break;
             }
         })

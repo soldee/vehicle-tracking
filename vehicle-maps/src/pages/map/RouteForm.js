@@ -29,14 +29,8 @@ export default function RouteForm({ onSearchRouteId, mapFeatures, onMapFeaturesC
 
 
     function handleMapFeatureChange(type, change) {
-        switch(type){
-            case "route_points_toggled":
-                mapFeatures[type] = change
-                onMapFeaturesChange(mapFeatures)
-                break;
-            default:
-                break;
-        }
+        mapFeatures[type] = change
+        onMapFeaturesChange(mapFeatures)
     }
 
 
@@ -55,6 +49,14 @@ export default function RouteForm({ onSearchRouteId, mapFeatures, onMapFeaturesC
                     type="checkbox"
                     checked={mapFeatures.route_points_toggled}
                     onChange={(e) => handleMapFeatureChange("route_points_toggled", e.target.checked)} 
+                />
+            </label>
+            <label>
+                Focus on click
+                <input 
+                    type="checkbox"
+                    checked={mapFeatures.focus_on_click}
+                    onChange={(e) => handleMapFeatureChange("focus_on_click", e.target.checked)}
                 />
             </label>
         </div>

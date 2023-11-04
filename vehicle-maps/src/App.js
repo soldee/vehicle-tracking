@@ -9,7 +9,8 @@ export default function App() {
 
     const [vehiclesData, setVehiclesData] = useState([])
     const [mapFeatures, setMapFeatures] = useState({
-        route_points_toggled: false
+        route_points_toggled: false,
+        focus_on_click: false
     })
 
     function searchRouteHandler(json) {

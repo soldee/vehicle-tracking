@@ -36,6 +36,7 @@ export default function MapFeatures({ data, features }) {
                         route_id={vehicle.route_id} 
                         color="#0fff"
                         route_points_toggled={features.route_points_toggled}
+                        focus_on_click={features.focus_on_click}
                     />
                 })
             }
