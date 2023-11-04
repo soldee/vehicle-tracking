@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Filters({ onSearchRouteId }) {
+export default function FiltersForm({ onSearchRouteId }) {
 
     function handleSubmit(e) {
         e.preventDefault()

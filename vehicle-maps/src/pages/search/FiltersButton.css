@@ -1,0 +1,33 @@
+.filters-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.filters-button button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    
+    color: #000000;
+    background: #a8c5d8;
+    border: none;
+    border-radius: 10px;
+    padding: 3px 5px;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.filters-button button:hover {
+    background-color: #88b7d6;
+}
+
+.material-symbols-outlined.search {
+    font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 200, 'opsz' 24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
