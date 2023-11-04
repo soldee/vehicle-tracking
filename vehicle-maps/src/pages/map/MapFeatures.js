@@ -32,7 +32,8 @@ export default function MapFeatures({ data, features }) {
                     return <Route 
                         key={vehicle.vehicle_id} 
                         coordinates={vehicle.coordinates}
-                        timestamps={vehicle.ts} 
+                        timestamps={vehicle.ts}
+                        speeds={vehicle.speed}
                         vehicle_id={vehicle.vehicle_id} 
                         route_id={vehicle.route_id}
                         color="#0fff"

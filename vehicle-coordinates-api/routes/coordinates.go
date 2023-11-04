@@ -30,19 +30,16 @@ func GetStatusByRouteId(w http.ResponseWriter, r *http.Request) {
 			{Key: "meta.route_id", Value: routeID},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: bson.D{
-				{Key: "route_id", Value: "$meta.route_id"},
-				{Key: "vehicle_id", Value: "$meta.vehicle_id"},
-			}},
+			{Key: "_id", Value: "null"},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
+			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
+			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
+			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
+			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
-			{Key: "route_id", Value: "$_id.route_id"},
-			{Key: "vehicle_id", Value: "$_id.vehicle_id"},
-			{Key: "coordinates", Value: 1},
-			{Key: "ts", Value: 1},
 		}}},
 	})
 	if err != nil {

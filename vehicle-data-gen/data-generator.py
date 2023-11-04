@@ -28,14 +28,14 @@ def runner(collection, csvPath):
     route_id = str(uuid.uuid4())
     user_id = os.path.basename(csv_path).split(".")[0]
     vehicle_id = user_id
-    speed = random.uniform(0.1, 4)
 
     with open(csvPath) as csv_file:
         reader = csv.reader(csv_file, delimiter=",")
         for row in reader:
             lat = float(row[0])
             long = float(row[1])
-            print("{},{}".format(lat,long))
+            speed = random.uniform(0.1, 4)
+            print("{},{},{}".format(lat,long,speed))
 
             collection.insert_one(generateStatus(route_id, user_id, vehicle_id, speed, lat, long))
             time.sleep(5)
