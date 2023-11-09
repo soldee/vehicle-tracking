@@ -13,8 +13,8 @@
 
 .modal {
     background-color: white;
-    width: 70%;
-    height: 70%;
+    width: 500px;
+    height: 300px;
     min-width: 400px;
     border-radius: 20px;
     position: relative;
