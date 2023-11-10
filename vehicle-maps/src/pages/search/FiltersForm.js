@@ -76,8 +76,8 @@ export default function FiltersForm({ onSearchRouteId }) {
                     </div>
                 </div>
             </div>
-            <button type="submit" class={`submit-button ${isLoading && "button--loading"}`} >
-                <span class="button__text">Save</span>
+            <button type="submit" className={`submit-button ${isLoading && "button--loading"}`} >
+                <span className="button__text">Save</span>
             </button>
         </form>
     )
