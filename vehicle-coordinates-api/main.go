@@ -3,8 +3,10 @@ package main
 import (
 	"errors"
 	"net/http"
+	"vehicle-maps/api"
+	"vehicle-maps/db"
 	"vehicle-maps/response"
-	"vehicle-maps/routes"
+	"vehicle-maps/services"
 
 	"log"
 	"os"
@@ -25,6 +27,11 @@ func main() {
 		log.Fatal("PORT env variable not found")
 	}
 
+	// DI
+	statusRepo := db.NewMongoStatusRepo(db.DBInstance())
+	statusService := services.NewStatusService(statusRepo)
+	statusHandler := api.StatusHandler{StatusService: statusService}
+
 	router := chi.NewRouter()
 
 	// middlewares
@@ -39,10 +46,6 @@ func main() {
 
 	router.Use(middleware.Logger)
 
-	// static files route definition
-	fs := http.FileServer(http.Dir("./static"))
-	router.Handle("/*", fs)
-
 	// route definition
 	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
@@ -51,7 +54,8 @@ func main() {
 		response.HandleErrorResponse(w, 400, errors.New("something went wrong"))
 	})
 	router.Route("/vehicle", func(r chi.Router) {
-		r.Get("/status", routes.GetStatusByRouteId)
+		r.Get("/status", statusHandler.HandleGetStatus)
+		//r.Get("/status/subscribe")
 	})
 
 	// server start

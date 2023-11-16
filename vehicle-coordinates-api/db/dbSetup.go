@@ -1,4 +1,4 @@
-package configs
+package db
 
 import (
 	"context"
@@ -30,10 +30,4 @@ func DBInstance() *mongo.Client {
 	}
 
 	return client
-}
-
-var mongoClient = DBInstance()
-
-func GetCollection(collectionName string) *mongo.Collection {
-	return mongoClient.Database("VEHICLE-TRACKING").Collection(collectionName)
 }
