@@ -31,13 +31,26 @@ func HandleErrorResponseErr(w http.ResponseWriter, err error) {
 	var invalidInputErr *InvalidInput
 	var notFoundErr *NotFound
 
+	var code = http.StatusInternalServerError
+
 	switch {
 	case errors.As(err, &invalidInputErr):
-		HandleErrorResponse(w, http.StatusUnprocessableEntity, err)
+		code = http.StatusUnprocessableEntity
+		if invalidInputErr.Code != 0 {
+			code = invalidInputErr.Code
+		}
+		HandleErrorResponse(w, code, err)
 	case errors.As(err, &notFoundErr):
-		HandleErrorResponse(w, http.StatusNotFound, err)
+		code = http.StatusNotFound
+		if notFoundErr.Code != 0 {
+			code = notFoundErr.Code
+		}
+		HandleErrorResponse(w, code, err)
 	case errors.As(err, &internalErr):
-		HandleErrorResponse(w, http.StatusInternalServerError, err)
+		if internalErr.Code != 0 {
+			code = internalErr.Code
+		}
+		HandleErrorResponse(w, code, err)
 	default:
 		HandleErrorResponse(w, http.StatusInternalServerError, err)
 	}

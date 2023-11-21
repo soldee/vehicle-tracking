@@ -1,7 +1,8 @@
 package response
 
 type InternalError struct {
-	Msg string
+	Msg  string
+	Code int
 }
 
 func (err *InternalError) Error() string {
@@ -9,7 +10,8 @@ func (err *InternalError) Error() string {
 }
 
 type InvalidInput struct {
-	Msg string
+	Msg  string
+	Code int
 }
 
 func (err *InvalidInput) Error() string {
@@ -17,7 +19,8 @@ func (err *InvalidInput) Error() string {
 }
 
 type NotFound struct {
-	Msg string
+	Msg  string
+	Code int
 }
 
 func (err *NotFound) Error() string {
