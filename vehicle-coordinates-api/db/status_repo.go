@@ -2,7 +2,9 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"time"
 	"vehicle-maps/models"
 	"vehicle-maps/response"
 
@@ -11,7 +13,11 @@ import (
 )
 
 type StatusRepo interface {
-	GetByRouteId(ctx context.Context, RouteId string) (*models.Status, error)
+	FindByRouteId(ctx context.Context, RouteId string) (*models.Status, error)
+	FindByRouteIdBetween(ctx context.Context, RouteId string, DateFrom time.Time, DateTo time.Time) (*models.Status, error)
+	FindByVehicleId(ctx context.Context, VehicleId string) ([]*models.Status, error)
+	FindByVehicleIdBetween(ctx context.Context, VehicleId string, DateFrom time.Time, DateTo time.Time) ([]*models.Status, error)
+	FindByRouteIdAndVehicleIdBetween(ctx context.Context, RouteId string, VehicleId string, DateFrom time.Time, DateTo time.Time) (*models.Status, error)
 }
 
 type MongoStatusRepo struct {
@@ -24,7 +30,7 @@ func NewMongoStatusRepo(client *mongo.Client) *MongoStatusRepo {
 	}
 }
 
-func (repo *MongoStatusRepo) GetByRouteId(ctx context.Context, RouteId string) (*models.Status, error) {
+func (repo *MongoStatusRepo) FindByRouteId(ctx context.Context, RouteId string) (*models.Status, error) {
 
 	cursor, err := repo.coordinatesCollection.Aggregate(ctx, mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{
@@ -59,4 +65,47 @@ func (repo *MongoStatusRepo) GetByRouteId(ctx context.Context, RouteId string) (
 	}
 
 	return &results[0], nil
+}
+
+func (repo *MongoStatusRepo) FindByRouteIdBetween(ctx context.Context, RouteId string, DateFrom time.Time, DateTo time.Time) (*models.Status, error) {
+	status, err := repo.FindByRouteId(ctx, RouteId)
+	if err != nil {
+		return nil, &response.NotFound{Msg: fmt.Sprintf("route_id %v not found", RouteId)}
+	}
+
+	routeStartTime := status.Timestamp[0].Time()
+
+	if !(DateBetween(routeStartTime, DateFrom, DateTo)) {
+		return nil, &response.NotFound{Msg: fmt.Sprintf("route_id %v not found in the specified date range '%v' '%v'", RouteId, DateFrom, DateTo)}
+	}
+	return status, nil
+}
+
+func (repo *MongoStatusRepo) FindByVehicleId(ctx context.Context, VehicleId string) ([]*models.Status, error) {
+	return []*models.Status{}, errors.New("not implemented")
+}
+
+func (repo *MongoStatusRepo) FindByVehicleIdBetween(ctx context.Context, RouteId string, DateFrom time.Time, DateTo time.Time) ([]*models.Status, error) {
+	return []*models.Status{}, errors.New("not implemented")
+}
+
+func (repo *MongoStatusRepo) FindByRouteIdAndVehicleIdBetween(ctx context.Context, RouteId string, VehicleId string, DateFrom time.Time, DateTo time.Time) (*models.Status, error) {
+	status, err := repo.FindByRouteId(ctx, RouteId)
+	if err != nil {
+		return nil, &response.NotFound{Msg: fmt.Sprintf("route_id %v not found", RouteId)}
+	}
+
+	routeStartTime := status.Timestamp[0].Time()
+
+	if !(DateBetween(routeStartTime, DateFrom, DateTo)) {
+		return nil, &response.NotFound{Msg: fmt.Sprintf("route_id %v not found in the specified date range '%v' '%v'", RouteId, DateFrom, DateTo)}
+	}
+	if status.VehicleId != VehicleId {
+		return nil, &response.NotFound{Msg: fmt.Sprintf("route_id %v not found in the specified date range '%v' '%v' for the vehicle '%v'", RouteId, DateFrom, DateTo, VehicleId)}
+	}
+	return status, nil
+}
+
+func DateBetween(t, dateFrom, dateTo time.Time) bool {
+	return (t.Equal(dateFrom) || t.After(dateFrom)) && (t.Equal(dateTo) || t.Before(dateTo))
 }
