@@ -73,7 +73,7 @@ func GetValidatedFilters(r *http.Request) (string, string, time.Time, time.Time,
 	var dateTo time.Time
 	var err error
 	if dateFromIn != "" && dateToIn != "" {
-		dateFrom, dateTo, err = isDateRangeValid(&dateFromIn, &dateToIn)
+		dateFrom, dateTo, err = isDateRangeValid(&dateFromIn, &dateToIn, time.RFC3339)
 		if err != nil {
 			return "", "", time.Time{}, time.Time{}, &response.InvalidInput{Msg: err.Error()}
 		}
@@ -90,9 +90,7 @@ func GetValidatedFilters(r *http.Request) (string, string, time.Time, time.Time,
 	return routeID, userID, dateFrom, dateTo, nil
 }
 
-func isDateRangeValid(dateFromStr *string, dateToStr *string) (time.Time, time.Time, error) {
-	format := time.RFC3339
-
+func isDateRangeValid(dateFromStr *string, dateToStr *string, format string) (time.Time, time.Time, error) {
 	errors := make([]error, 0)
 
 	dateFrom, err := time.Parse(format, *dateFromStr)
@@ -110,9 +108,12 @@ func isDateRangeValid(dateFromStr *string, dateToStr *string) (time.Time, time.T
 	if len(errors) > 0 {
 		var errorStr string
 		for _, err := range errors {
-			errorStr += err.Error()
+			errorStr += err.Error() + ", "
 		}
+		errorStr = errorStr[:len(errorStr)-2]
 		return time.Time{}, time.Time{}, fmt.Errorf("invalid date range specified: %v", errorStr)
+	} else if dateFrom.After(dateTo) {
+		return time.Time{}, time.Time{}, fmt.Errorf("invalid date range specified: lower date bound must be lower than the higher date bound")
 	}
 	return dateFrom, dateTo, nil
 }
