@@ -30,7 +30,11 @@ func main() {
 	// DI
 	statusRepo := db.NewMongoStatusRepo(db.DBInstance())
 	statusService := services.NewStatusService(statusRepo)
-	statusHandler := api.StatusHandler{StatusService: statusService}
+	subscribeService := services.NewSubscribeService(statusRepo)
+	statusHandler := api.StatusHandler{
+		StatusService:    statusService,
+		SubscribeService: subscribeService,
+	}
 
 	router := chi.NewRouter()
 
@@ -55,7 +59,7 @@ func main() {
 	})
 	router.Route("/vehicle", func(r chi.Router) {
 		r.Get("/status", statusHandler.HandleGetStatus)
-		//r.Get("/status/subscribe")
+		r.Get("/status/subscribe", statusHandler.HandleSubscribe)
 	})
 
 	// server start
