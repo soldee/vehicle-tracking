@@ -23,39 +23,35 @@ func NewStatusService(statusRepo db.StatusRepo) *StatusService {
 
 func (service *StatusService) GetRouteById(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 
-	routeID, vehicleID, dateFrom, dateTo, err := GetValidatedFilters(r)
+	routeID, userID, dateFrom, dateTo, err := GetValidatedFilters(r)
 	if err != nil {
 		response.HandleErrorResponseErr(w, err)
 		return
 	}
 
-	var statusList []*models.Status
+	var statusList []models.Status
+	var status *models.Status
 
-	if routeID != "" && vehicleID == "" && dateFrom.IsZero() && dateTo.IsZero() {
-		var status *models.Status
+	if routeIDSet(routeID, userID, dateFrom, dateTo) {
 		status, err = service.statusRepo.FindByRouteId(ctx, routeID)
-		statusList = []*models.Status{status}
-	} else if routeID == "" && vehicleID != "" && dateFrom.IsZero() && dateTo.IsZero() {
-		statusList, err = service.statusRepo.FindByVehicleId(ctx, vehicleID)
-	} else if routeID != "" && vehicleID == "" && !dateFrom.IsZero() && !dateTo.IsZero() {
-		var status *models.Status
+	} else if userIDSet(routeID, userID, dateFrom, dateTo) {
+		statusList, err = service.statusRepo.FindByUserId(ctx, userID)
+	} else if routeIDAndDatesSet(routeID, userID, dateFrom, dateTo) {
 		status, err = service.statusRepo.FindByRouteIdBetween(ctx, routeID, dateFrom, dateTo)
-		statusList = []*models.Status{status}
-	} else if routeID == "" && vehicleID != "" && !dateFrom.IsZero() && !dateTo.IsZero() {
-		statusList, err = service.statusRepo.FindByVehicleIdBetween(ctx, vehicleID, dateFrom, dateTo)
-	} else if routeID != "" && vehicleID != "" && dateFrom.IsZero() && dateTo.IsZero() {
-		var status *models.Status
-		status, err = service.statusRepo.FindByRouteIdAndVehicleIdBetween(ctx, routeID, vehicleID, time.Time{}, time.Now())
-		statusList = []*models.Status{status}
+	} else if userIDAndDatesSet(routeID, userID, dateFrom, dateTo) {
+		statusList, err = service.statusRepo.FindByUserIdBetween(ctx, userID, dateFrom, dateTo)
+	} else if routeIDAndUserIDSet(routeID, userID, dateFrom, dateTo) {
+		status, err = service.statusRepo.FindByRouteIdAndUserIdBetween(ctx, routeID, userID, time.Time{}, time.Now())
 	} else {
-		var status *models.Status
-		status, err = service.statusRepo.FindByRouteIdAndVehicleIdBetween(ctx, routeID, vehicleID, dateFrom, dateTo)
-		statusList = []*models.Status{status}
+		status, err = service.statusRepo.FindByRouteIdAndUserIdBetween(ctx, routeID, userID, dateFrom, dateTo)
 	}
 
 	if err != nil {
 		response.HandleErrorResponseErr(w, err)
 		return
+	}
+	if statusList == nil {
+		statusList = []models.Status{*status}
 	}
 
 	response.HandleJsonResponse(w, http.StatusOK, statusList)
@@ -65,11 +61,11 @@ func GetValidatedFilters(r *http.Request) (string, string, time.Time, time.Time,
 	errors := make([]string, 0)
 
 	var routeID string = r.URL.Query().Get("route_id")
-	var vehicleID string = r.URL.Query().Get("vehicle_id")
+	var userID string = r.URL.Query().Get("user_id")
 	var dateFromIn string = r.URL.Query().Get("date[gt]")
 	var dateToIn string = r.URL.Query().Get("date[lt]")
 
-	if routeID == "" && vehicleID == "" && dateFromIn == "" && dateToIn == "" {
+	if routeID == "" && userID == "" && dateFromIn == "" && dateToIn == "" {
 		return "", "", time.Time{}, time.Time{}, &response.InvalidInput{Msg: "At least one of the following query parameters required: route_id, vehicle_id, date range (date[gt] and date[lt])"}
 	}
 
@@ -91,7 +87,7 @@ func GetValidatedFilters(r *http.Request) (string, string, time.Time, time.Time,
 		return "", "", time.Time{}, time.Time{}, &response.InvalidInput{Msg: errorMessage}
 	}
 
-	return routeID, vehicleID, dateFrom, dateTo, nil
+	return routeID, userID, dateFrom, dateTo, nil
 }
 
 func isDateRangeValid(dateFromStr *string, dateToStr *string) (time.Time, time.Time, error) {
@@ -119,4 +115,24 @@ func isDateRangeValid(dateFromStr *string, dateToStr *string) (time.Time, time.T
 		return time.Time{}, time.Time{}, fmt.Errorf("invalid date range specified: %v", errorStr)
 	}
 	return dateFrom, dateTo, nil
+}
+
+func routeIDSet(routeID string, userID string, dateFrom time.Time, dateTo time.Time) bool {
+	return routeID != "" && userID == "" && dateFrom.IsZero() && dateTo.IsZero()
+}
+
+func routeIDAndDatesSet(routeID string, userID string, dateFrom time.Time, dateTo time.Time) bool {
+	return routeID != "" && userID == "" && !dateFrom.IsZero() && !dateTo.IsZero()
+}
+
+func routeIDAndUserIDSet(routeID string, userID string, dateFrom time.Time, dateTo time.Time) bool {
+	return routeID != "" && userID != "" && dateFrom.IsZero() && dateTo.IsZero()
+}
+
+func userIDSet(routeID string, userID string, dateFrom time.Time, dateTo time.Time) bool {
+	return routeID == "" && userID != "" && dateFrom.IsZero() && dateTo.IsZero()
+}
+
+func userIDAndDatesSet(routeID string, userID string, dateFrom time.Time, dateTo time.Time) bool {
+	return routeID == "" && userID != "" && !dateFrom.IsZero() && !dateTo.IsZero()
 }
