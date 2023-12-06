@@ -21,7 +21,7 @@ type Broker struct {
 func NewBroker() *Broker {
 	return &Broker{
 		subs:      make([]*Sub, 0),
-		freeSlots: make(chan int),
+		freeSlots: make(chan int, 1000),
 	}
 }
 
