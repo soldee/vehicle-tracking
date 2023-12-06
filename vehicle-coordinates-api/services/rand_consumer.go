@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"time"
@@ -14,7 +15,7 @@ func NewRandomConsumer() *RandomConsumer {
 	return &RandomConsumer{}
 }
 
-func (consumer *RandomConsumer) Read(ctx context.Context, msgCh chan models.Message, errorCh chan error) {
+func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker, errorCh chan error) {
 
 	for {
 		routeId, vehicleId, userId := generateRouteUserVehicle()
@@ -29,10 +30,16 @@ func (consumer *RandomConsumer) Read(ctx context.Context, msgCh chan models.Mess
 		}
 
 		fmt.Printf("New message: %v\n", msg)
-		msgCh <- msg
-
+		b, err := json.Marshal(msg)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		broker.Publish(string(b))
+		fmt.Println("published")
 		time.Sleep(time.Second * 10)
 	}
+	fmt.Println("Random consumer done")
 }
 
 func generateTimestamp() time.Time {
