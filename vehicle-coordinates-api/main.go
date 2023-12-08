@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"vehicle-maps/api"
@@ -28,9 +29,13 @@ func main() {
 	}
 
 	// DI
+	broker := services.NewBroker()
 	statusRepo := db.NewMongoStatusRepo(db.DBInstance())
 	statusService := services.NewStatusService(statusRepo)
-	subscribeService := services.NewSubscribeService(statusRepo)
+	subscribeService := services.NewSubscribeService(statusRepo, broker)
+	consumer := services.NewRandomConsumer()
+	go consumer.Read(context.Background(), broker, make(chan error))
+
 	statusHandler := api.StatusHandler{
 		StatusService:    statusService,
 		SubscribeService: subscribeService,

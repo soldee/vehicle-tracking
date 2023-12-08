@@ -29,17 +29,15 @@ func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker, errorC
 			UserId:      userId,
 		}
 
-		fmt.Printf("New message: %v\n", msg)
+		fmt.Printf("Generated new message: %v\n", msg)
 		b, err := json.Marshal(msg)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		broker.Publish(string(b))
-		fmt.Println("published")
 		time.Sleep(time.Second * 10)
 	}
-	fmt.Println("Random consumer done")
 }
 
 func generateTimestamp() time.Time {
