@@ -6,5 +6,5 @@ import (
 )
 
 type QueueConsumer interface {
-	Read(ctx context.Context, msgCh chan models.Message, errorCh chan error)
+	Read(ctx context.Context, msgCh chan models.Message)
 }

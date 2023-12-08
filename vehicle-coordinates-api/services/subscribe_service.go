@@ -51,6 +51,10 @@ func (s *SubscribeService) Subscribe(w http.ResponseWriter, r *http.Request, ctx
 			fmt.Fprintf(w, "event: status\ndata: %v\n\n", msg)
 			keepAlive.Reset(tickerTime)
 			flusher.Flush()
+		case err := <-sub.errors:
+			fmt.Fprintf(w, "event: close\ndata: %v\n\n", err.Error())
+			flusher.Flush()
+			return
 		case <-keepAlive.C:
 			fmt.Fprint(w, ":keep-alive\n\n")
 			flusher.Flush()

@@ -34,7 +34,7 @@ func main() {
 	statusService := services.NewStatusService(statusRepo)
 	subscribeService := services.NewSubscribeService(statusRepo, broker)
 	consumer := services.NewRandomConsumer()
-	go consumer.Read(context.Background(), broker, make(chan error))
+	go consumer.Read(context.Background(), broker)
 
 	statusHandler := api.StatusHandler{
 		StatusService:    statusService,

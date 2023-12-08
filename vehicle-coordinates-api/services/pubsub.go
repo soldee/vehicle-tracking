@@ -9,6 +9,7 @@ type Sub struct {
 	id     int
 	active bool
 	msgs   chan string
+	errors chan error
 	mutex  sync.RWMutex
 }
 
@@ -40,6 +41,7 @@ func (b *Broker) Subscribe() *Sub {
 			id:     len(b.subs),
 			active: true,
 			msgs:   make(chan string),
+			errors: make(chan error),
 		}
 		b.subs = append(b.subs, sub)
 	}
@@ -70,6 +72,16 @@ func (b *Broker) Publish(msg string) {
 		sub.mutex.Lock()
 		if sub.active {
 			sub.msgs <- msg
+		}
+		sub.mutex.Unlock()
+	}
+}
+
+func (b *Broker) PublishError(err error) {
+	for _, sub := range b.subs {
+		sub.mutex.Lock()
+		if sub.active {
+			sub.errors <- err
 		}
 		sub.mutex.Unlock()
 	}

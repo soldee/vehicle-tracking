@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -15,9 +16,21 @@ func NewRandomConsumer() *RandomConsumer {
 	return &RandomConsumer{}
 }
 
-func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker, errorCh chan error) {
+func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker) {
 
 	for {
+		if rand.Float32() < 0.1 {
+			err := generateError()
+			broker.PublishError(err)
+			fmt.Printf("Generated error: %v", err.Error())
+			time.Sleep(time.Second * 5)
+			broker.PublishError(generateError())
+			fmt.Printf("Generated error: %v", err.Error())
+			time.Sleep(time.Second * 5)
+			broker.PublishError(generateError())
+			fmt.Printf("Generated error: %v", err.Error())
+			time.Sleep(time.Second * 5)
+		}
 		routeId, vehicleId, userId := generateRouteUserVehicle()
 
 		msg := models.Message{
@@ -38,6 +51,10 @@ func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker, errorC
 		broker.Publish(string(b))
 		time.Sleep(time.Second * 10)
 	}
+}
+
+func generateError() error {
+	return errors.New("unavailable sink, try reconnecting")
 }
 
 func generateTimestamp() time.Time {
