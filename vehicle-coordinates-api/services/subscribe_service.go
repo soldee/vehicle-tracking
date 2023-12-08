@@ -23,6 +23,8 @@ func NewSubscribeService(statusRepo db.StatusRepo, broker *Broker) *SubscribeSer
 
 func (s *SubscribeService) Subscribe(w http.ResponseWriter, r *http.Request, ctx context.Context) {
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -46,7 +48,7 @@ func (s *SubscribeService) Subscribe(w http.ResponseWriter, r *http.Request, ctx
 	for {
 		select {
 		case msg := <-sub.msgs:
-			fmt.Fprintf(w, "data: %v\n\n", msg)
+			fmt.Fprintf(w, "event: status\ndata: %v\n\n", msg)
 			keepAlive.Reset(tickerTime)
 			flusher.Flush()
 		case <-keepAlive.C:
