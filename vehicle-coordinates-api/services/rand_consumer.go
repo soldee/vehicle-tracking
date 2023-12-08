@@ -21,15 +21,9 @@ func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker) {
 	for {
 		if rand.Float32() < 0.1 {
 			err := generateError()
-			broker.PublishError(err)
-			fmt.Printf("Generated error: %v", err.Error())
-			time.Sleep(time.Second * 5)
-			broker.PublishError(generateError())
-			fmt.Printf("Generated error: %v", err.Error())
-			time.Sleep(time.Second * 5)
-			broker.PublishError(generateError())
-			fmt.Printf("Generated error: %v", err.Error())
-			time.Sleep(time.Second * 5)
+			sendError(broker, err)
+			sendError(broker, err)
+			sendError(broker, err)
 		}
 		routeId, vehicleId, userId := generateRouteUserVehicle()
 
@@ -55,6 +49,12 @@ func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker) {
 
 func generateError() error {
 	return errors.New("unavailable sink, try reconnecting")
+}
+
+func sendError(broker *Broker, err error) {
+	broker.PublishError(err)
+	fmt.Printf("Generated error: %v", err.Error())
+	time.Sleep(time.Second * 5)
 }
 
 func generateTimestamp() time.Time {
