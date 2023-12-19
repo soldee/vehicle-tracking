@@ -47,43 +47,41 @@ function Route({vehicle_id, coordinates, timestamps, speeds, route_id, route_poi
     }
 
     return (
-        <React.Fragment>
-            <FeatureGroup eventHandlers={{ click: onFeatureGroupClick }} >
-                <Marker position={vehicle_coordinates} type='vehicle' icon={finalIcon} >
-                    <Popup>
-                        <dl>
-                            <dt><b>Vehicle ID</b> {vehicle_id}</dt>
-                            <dt><b>Route ID</b> {route_id}</dt>
-                        </dl>
-                    </Popup>
-                </Marker>
-                <Polyline positions={coordinates} pathOptions={route_options} type='route' />
-                {
-                    route_points_toggled &&
-                    coordinates.map((c, index) => {
-                        return <Marker key={c} position={c} icon={pointsIcon} eventHandlers={{
-                            mouseover: (e) => e.target.openPopup(),
-                            mouseout: (e) => e.target.closePopup()
-                        }}>
-                            <Popup>
-                                <dl>
-                                    <dt>
-                                        <b>Timestamp</b> {
-                                            new Date(timestamps[index]).toLocaleString("es-ES", {timeZone: "Europe/Madrid"})
-                                        }
-                                    </dt>
-                                    <dt>
-                                        <b>Speed</b> {
-                                            speeds[index]
-                                        } m/s
-                                    </dt>
-                                </dl>
-                            </Popup>
-                        </Marker>
-                    })
-                }
-            </FeatureGroup>
-        </React.Fragment>
+        <FeatureGroup eventHandlers={{ click: onFeatureGroupClick }} >
+            <Marker position={vehicle_coordinates} type='vehicle' icon={finalIcon} >
+                <Popup>
+                    <dl>
+                        <dt><b>Vehicle ID</b> {vehicle_id}</dt>
+                        <dt><b>Route ID</b> {route_id}</dt>
+                    </dl>
+                </Popup>
+            </Marker>
+            <Polyline positions={coordinates} pathOptions={route_options} type='route' />
+            {
+                route_points_toggled &&
+                coordinates.map((c, index) => {
+                    return <Marker key={c} position={c} icon={pointsIcon} eventHandlers={{
+                        mouseover: (e) => e.target.openPopup(),
+                        mouseout: (e) => e.target.closePopup()
+                    }}>
+                        <Popup>
+                            <dl>
+                                <dt>
+                                    <b>Timestamp</b> {
+                                        new Date(timestamps[index]).toLocaleString("es-ES", { timeZone: "Europe/Madrid" })
+                                    }
+                                </dt>
+                                <dt>
+                                    <b>Speed</b> {
+                                        speeds[index]
+                                    } m/s
+                                </dt>
+                            </dl>
+                        </Popup>
+                    </Marker>
+                })
+            }
+        </FeatureGroup>
     )
 
 }
