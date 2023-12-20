@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 	"vehicle-maps/models"
@@ -118,7 +117,39 @@ func (repo *MongoStatusRepo) FindByUserId(ctx context.Context, UserId string) ([
 }
 
 func (repo *MongoStatusRepo) FindByUserIdBetween(ctx context.Context, UserId string, DateFrom time.Time, DateTo time.Time) ([]models.Status, error) {
-	return []models.Status{}, errors.New("not implemented")
+	cursor, err := repo.coordinatesCollection.Aggregate(ctx, mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{
+			{Key: "meta.user_id", Value: UserId},
+			{Key: "ts", Value: bson.D{{Key: "$gt", Value: DateFrom}, {Key: "$lt", Value: DateTo}}},
+		}}},
+		{{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: "null"},
+			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
+			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
+			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
+			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
+			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
+			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
+		}}},
+		{{Key: "$project", Value: bson.D{
+			{Key: "_id", Value: 0},
+		}}},
+	})
+	if err != nil {
+		return nil, &response.InternalError{Msg: "FindByUserIdBetween aggregation generated error:" + err.Error()}
+	}
+
+	defer cursor.Close(ctx)
+
+	var results []models.Status
+	if err = cursor.All(ctx, &results); err != nil {
+		return nil, &response.InternalError{Msg: "FindByUserIdBetween error unmarshalling bson response into Status model: " + err.Error()}
+	}
+
+	if len(results) == 0 {
+		return nil, &response.NotFound{Msg: fmt.Sprintf("No routes found for user_id %v between the specified dates %v-%v", UserId, DateFrom, DateTo)}
+	}
+	return results, nil
 }
 
 func (repo *MongoStatusRepo) FindByRouteIdAndUserIdBetween(ctx context.Context, RouteId string, UserId string, DateFrom time.Time, DateTo time.Time) (*models.Status, error) {
