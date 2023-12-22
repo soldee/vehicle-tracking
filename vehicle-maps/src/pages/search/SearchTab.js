@@ -13,8 +13,7 @@ export default function SearchTab({ mapFeatures, onMapFeaturesChange}) {
     const [showFilters, setShowFilters] = useState(false)
     
     function searchRouteHandler(json) {
-        const data = [json]
-        setVehiclesData(data)
+        setVehiclesData(json)
         setShowFilters(false)
     }
 

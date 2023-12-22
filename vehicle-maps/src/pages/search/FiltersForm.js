@@ -15,13 +15,20 @@ export default function FiltersForm({ onSearchRouteId }) {
         const route_id = form.get("route_id_input")
         const vehicle_id = form.get("vehicle_id_input")
         const user_id = form.get("user_id_input")
+        const date_from = form.get("date_from_input")
+        const date_to = form.get("date_to_input")
 
-        fetch(window.REACT_APP_DOMAIN + "/vehicle/status?" + new URLSearchParams({
-            route_id: route_id
-        }), { method: form.method })
+        const params = {}
+        if (route_id != "") params.route_id = route_id
+        if (vehicle_id != "") params.vehicle_id = vehicle_id
+        if (user_id != "") params.user_id = user_id
+        if (date_from != "") params['date[gt]'] = date_from
+        if (date_to != "") params['date[lt]'] = date_to
+
+        fetch(window.REACT_APP_DOMAIN + "/vehicle/status?" + new URLSearchParams(params), { method: form.method })
             .then(async (response) => {
-                const json = await response.json();
                 setIsLoading(false)
+                const json = await response.json();
 
                 if (!response.ok) {
                     const err = json.error
