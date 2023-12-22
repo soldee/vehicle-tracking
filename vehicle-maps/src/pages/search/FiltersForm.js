@@ -1,31 +1,65 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import './FiltersForm.css'
 
 
-export default function FiltersForm({ onSearchRouteId }) {
+export default function FiltersForm({ onSearchRouteId, isDataDisplayed }) {
 
     const [isLoading, setIsLoading] = useState(false)
+    const [routeID, setRouteID] = useState("")
+    const [userID, setUserID] = useState("")
+    const [vehicleID, setVehicleID] = useState("")
+    const [dateFrom, setDateFrom] = useState("")
+    const [dateTo, setDateTo] = useState("")
 
+    function clearStorage() {
+        localStorage.removeItem("route_id")
+        localStorage.removeItem("vehicle_id")
+        localStorage.removeItem("user_id")
+        localStorage.removeItem("date_from")
+        localStorage.removeItem("date_to")
+    }
+
+    useEffect(() => {
+        if (isDataDisplayed) {
+            setRouteID(localStorage.getItem("route_id"))
+            setUserID(localStorage.getItem("user_id"))
+            setVehicleID(localStorage.getItem("vehicle_id"))
+            setDateFrom(localStorage.getItem("date_from"))
+            setDateTo(localStorage.getItem("date_to"))
+        } else {
+            clearStorage()
+        }
+    }, [])
 
     function handleSubmit(e) {
         e.preventDefault()
         setIsLoading(true)
 
-        const form = new FormData(e.target)
-        const route_id = form.get("route_id_input")
-        const vehicle_id = form.get("vehicle_id_input")
-        const user_id = form.get("user_id_input")
-        const date_from = form.get("date_from_input")
-        const date_to = form.get("date_to_input")
+        clearStorage()
 
         const params = {}
-        if (route_id != "") params.route_id = route_id
-        if (vehicle_id != "") params.vehicle_id = vehicle_id
-        if (user_id != "") params.user_id = user_id
-        if (date_from != "") params['date[gt]'] = date_from
-        if (date_to != "") params['date[lt]'] = date_to
+        if (routeID != null && routeID.trim() != "") {
+            params.route_id = routeID
+            localStorage.setItem("route_id", routeID);
+        }
+        if (vehicleID != null && vehicleID.trim() != "") {
+            params.vehicle_id = vehicleID
+            localStorage.setItem("vehicle_id", vehicleID);
+        }
+        if (userID != null && userID.trim() != "") {
+            params.user_id = userID
+            localStorage.setItem("user_id", userID);
+        }
+        if (dateFrom != null && dateFrom.trim() != "") {
+            params['date[gt]'] = dateFrom
+            localStorage.setItem("date_from", dateFrom);
+        }
+        if (dateTo != null && dateTo.trim() != "") {
+            params['date[lt]'] = dateTo
+            localStorage.setItem("date_to", dateTo);
+        }
 
-        fetch(window.REACT_APP_DOMAIN + "/vehicle/status?" + new URLSearchParams(params), { method: form.method })
+        fetch(window.REACT_APP_DOMAIN + "/vehicle/status?" + new URLSearchParams(params), { method: "GET" })
             .then(async (response) => {
                 setIsLoading(false)
                 const json = await response.json();
@@ -51,19 +85,19 @@ export default function FiltersForm({ onSearchRouteId }) {
                     <div className="m-filter">
                         <label>
                             Route ID
-                            <input name="route_id_input" />
+                            <input value={routeID ?? ""} onChange={(e) => setRouteID(e.target.value)} />
                         </label>
                     </div>
                     <div className="m-filter">
                         <label>
                             Vehicle ID
-                            <input name="vehicle_id_input" />
+                            <input value={vehicleID ?? ""} onChange={(e) => setVehicleID(e.target.value)} />
                         </label>
                     </div>
                     <div className="m-filter">
                         <label>
                             User ID
-                            <input name="user_id_input" />
+                            <input value={userID ?? ""} onChange={(e) => setUserID(e.target.value)} />
                         </label>
                     </div>
                 </div>
@@ -72,13 +106,13 @@ export default function FiltersForm({ onSearchRouteId }) {
                     <div className="m-filter">
                         <label>
                             From
-                            <input name="date_from_input" />
+                            <input value={dateFrom ?? ""} onChange={(e) => setDateFrom(e.target.value)} />
                         </label>
                     </div>
                     <div className="m-filter">
                         <label>
                             To
-                            <input name="date_to_input" />
+                            <input values={dateTo ?? ""} onChange={(e) => setDateTo(e.target.value)} />
                         </label>
                     </div>
                 </div>

@@ -25,7 +25,7 @@ export default function SearchTab({ mapFeatures, onMapFeaturesChange}) {
             </div>
             { showFilters && 
                 <Modal onClose={() => setShowFilters(false)} > 
-                    <FiltersForm onSearchRouteId={searchRouteHandler} />
+                    <FiltersForm onSearchRouteId={searchRouteHandler} isDataDisplayed={vehiclesData.length !== 0} />
                 </Modal>    
             }
             <LeafletMap
