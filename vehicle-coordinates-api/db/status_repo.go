@@ -91,16 +91,21 @@ func (repo *MongoStatusRepo) FindByUserId(ctx context.Context, UserId string) ([
 			{Key: "meta.user_id", Value: UserId},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: "null"},
+			{Key: "_id", Value: "$meta.route_id"},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
-			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
 			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
 			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
+			{Key: "route_id", Value: "$_id"},
+			{Key: "vehicle_id", Value: 1},
+			{Key: "user_id", Value: 1},
+			{Key: "ts", Value: 1},
+			{Key: "coordinates", Value: 1},
+			{Key: "speed", Value: 1},
 		}}},
 	})
 	if err != nil {
@@ -128,16 +133,21 @@ func (repo *MongoStatusRepo) FindByUserIdBetween(ctx context.Context, UserId str
 			{Key: "ts", Value: bson.D{{Key: "$gt", Value: DateFrom}, {Key: "$lt", Value: DateTo}}},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: "null"},
+			{Key: "_id", Value: "$meta.route_id"},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
-			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
 			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
 			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
+			{Key: "route_id", Value: "$_id"},
+			{Key: "vehicle_id", Value: 1},
+			{Key: "user_id", Value: 1},
+			{Key: "ts", Value: 1},
+			{Key: "coordinates", Value: 1},
+			{Key: "speed", Value: 1},
 		}}},
 	})
 	if err != nil {
@@ -163,16 +173,21 @@ func (repo *MongoStatusRepo) FindByVehicleId(ctx context.Context, VehicleId stri
 			{Key: "meta.vehicle_id", Value: VehicleId},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: "null"},
+			{Key: "_id", Value: "$meta.route_id"},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
-			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
 			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
 			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
+			{Key: "route_id", Value: "$_id"},
+			{Key: "vehicle_id", Value: 1},
+			{Key: "user_id", Value: 1},
+			{Key: "ts", Value: 1},
+			{Key: "coordinates", Value: 1},
+			{Key: "speed", Value: 1},
 		}}},
 	})
 	if err != nil {
@@ -200,16 +215,21 @@ func (repo *MongoStatusRepo) FindByVehicleIdBetween(ctx context.Context, Vehicle
 			{Key: "ts", Value: bson.D{{Key: "$gt", Value: DateFrom}, {Key: "$lt", Value: DateTo}}},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: "null"},
+			{Key: "_id", Value: "$meta.route_id"},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
-			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
 			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
 			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
+			{Key: "route_id", Value: "$_id"},
+			{Key: "vehicle_id", Value: 1},
+			{Key: "user_id", Value: 1},
+			{Key: "ts", Value: 1},
+			{Key: "coordinates", Value: 1},
+			{Key: "speed", Value: 1},
 		}}},
 	})
 	if err != nil {
@@ -267,20 +287,25 @@ func (repo *MongoStatusRepo) FindByUserIdAndVehicleIdBetween(ctx context.Context
 	cursor, err := repo.coordinatesCollection.Aggregate(ctx, mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{
 			{Key: "meta.user_id", Value: UserId},
-			{Key: "ts", Value: bson.D{{Key: "$gt", Value: DateFrom}, {Key: "$lt", Value: DateTo}}},
 			{Key: "meta.vehicle_id", Value: VehicleId},
+			{Key: "ts", Value: bson.D{{Key: "$gt", Value: DateFrom}, {Key: "$lt", Value: DateTo}}},
 		}}},
 		{{Key: "$group", Value: bson.D{
-			{Key: "_id", Value: "null"},
+			{Key: "_id", Value: "$meta.route_id"},
 			{Key: "ts", Value: bson.D{{Key: "$push", Value: "$ts"}}},
 			{Key: "coordinates", Value: bson.D{{Key: "$push", Value: "$location.coordinates"}}},
 			{Key: "speed", Value: bson.D{{Key: "$push", Value: bson.D{{Key: "$trunc", Value: bson.A{"$speed", 2}}}}}},
-			{Key: "route_id", Value: bson.D{{Key: "$first", Value: "$meta.route_id"}}},
 			{Key: "vehicle_id", Value: bson.D{{Key: "$first", Value: "$meta.vehicle_id"}}},
 			{Key: "user_id", Value: bson.D{{Key: "$first", Value: "$meta.user_id"}}},
 		}}},
 		{{Key: "$project", Value: bson.D{
 			{Key: "_id", Value: 0},
+			{Key: "route_id", Value: "$_id"},
+			{Key: "vehicle_id", Value: 1},
+			{Key: "user_id", Value: 1},
+			{Key: "ts", Value: 1},
+			{Key: "coordinates", Value: 1},
+			{Key: "speed", Value: 1},
 		}}},
 	})
 	if err != nil {
