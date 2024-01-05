@@ -10,13 +10,17 @@ import (
 	"vehicle-maps/models"
 )
 
+type MessageConsumer interface {
+	Run(ctx context.Context, broker *Broker)
+}
+
 type RandomConsumer struct{}
 
 func NewRandomConsumer() *RandomConsumer {
 	return &RandomConsumer{}
 }
 
-func (consumer *RandomConsumer) Read(ctx context.Context, broker *Broker) {
+func (consumer *RandomConsumer) Run(ctx context.Context, broker *Broker) {
 
 	for {
 		if rand.Float32() < 0.1 {

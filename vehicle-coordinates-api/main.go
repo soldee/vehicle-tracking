@@ -33,8 +33,8 @@ func main() {
 	statusRepo := db.NewMongoStatusRepo(db.DBInstance())
 	statusService := services.NewStatusService(statusRepo)
 	subscribeService := services.NewSubscribeService(statusRepo, broker)
-	consumer := services.NewRandomConsumer()
-	go consumer.Read(context.Background(), broker)
+	var consumer services.MessageConsumer = services.NewKafkaConsumer(db.KafkaInstance())
+	go consumer.Run(context.Background(), broker)
 
 	statusHandler := api.StatusHandler{
 		StatusService:    statusService,
