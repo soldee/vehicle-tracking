@@ -5,3 +5,5 @@
 */.env
 */*.exe
 */node_modules/*
+.env
+__pycache__

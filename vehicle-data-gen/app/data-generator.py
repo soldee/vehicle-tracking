@@ -1,5 +1,3 @@
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
 import threading
 import os
 import csv
@@ -7,29 +5,20 @@ import time
 import random
 import datetime
 import uuid
+import sys
+from repo.mqtt_repo import MqttRepo
+from repo.mongo_repo import MongoRepo
+from repo.repo import Repo
+from dotenv import load_dotenv
 
-
-def connect_to_mongo():
-    client = MongoClient("mongodb://root:root@192.168.33.10:27017/?authSource=admin&replicaSet=rs0")
-                
-    try:
-        client.admin.command('ping')
-        print("Connected to MongoDB!")
-    except Exception as e:
-        print(e)
-        exit(1)
-
-    return client
-
-
-def runner(collection, csvPath):
-    print("Reading " + csvPath)
+def runner(repo, csv_path):
+    print("Reading " + csv_path)
 
     route_id = str(uuid.uuid4())
     user_id = os.path.basename(csv_path).split(".")[0]
     vehicle_id = user_id
 
-    with open(csvPath) as csv_file:
+    with open(csv_path) as csv_file:
         reader = csv.reader(csv_file, delimiter=",")
         for row in reader:
             lat = float(row[0])
@@ -37,11 +26,11 @@ def runner(collection, csvPath):
             speed = random.uniform(0.1, 4)
             print("{},{},{}".format(lat,long,speed))
 
-            collection.insert_one(generateStatus(route_id, user_id, vehicle_id, speed, lat, long))
+            repo.insert(record=generate_status(route_id, user_id, vehicle_id, speed, lat, long))
             time.sleep(5)
 
 
-def generateStatus(route_id, user_id, vehicle_id, speed, latitude, longitude):
+def generate_status(route_id, user_id, vehicle_id, speed, latitude, longitude):
     return {
         'ts': datetime.datetime.now(), 
         'meta': {
@@ -57,16 +46,28 @@ def generateStatus(route_id, user_id, vehicle_id, speed, latitude, longitude):
     }
 
 
-
-
 if __name__ == "__main__":
-    DB = "VEHICLE-TRACKING"
-    COLLECTION = "vehicle-status"
 
-    client = connect_to_mongo()
-    collection = client["VEHICLE-TRACKING"]["vehicle-status"]
+    if len(sys.argv) != 2:
+        print("Expected 1 argument")
+        exit(1)
 
-    scriptDirPath = os.path.dirname(os.path.realpath(__file__))
+    load_dotenv()
+
+    match sys.argv[1]:
+        case "--mongo":
+            mongo_uri = os.getenv("MONGO_URI")
+            if mongo_uri == "":
+                print("MONGO_URI env variable is required to connect to MongoDB")
+                exit(1)
+            repo = MongoRepo(mongo_uri)
+        case "--mqtt":
+            repo = MqttRepo()
+        case _:
+            print(f"Invalid argument provided for repo {sys.argv[0]}. Valid arguments are '--mongo' or '--mqtt'")
+            exit(1)
+
+    scriptDirPath = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     dataDir = os.path.join(scriptDirPath, "data")
     csvList = os.listdir(dataDir)
 
@@ -74,7 +75,7 @@ if __name__ == "__main__":
 
     for i in range(len(csvList)):
         csv_path = os.path.join(dataDir, csvList[i])
-        t = threading.Thread(target=runner, args=(collection,csv_path))
+        t = threading.Thread(target=runner, args=(repo,csv_path))
         threadPool.append(t)
         t.start()
         time.sleep(random.uniform(0.1,3))
