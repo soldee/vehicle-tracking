@@ -11,6 +11,8 @@ from repo.mongo_repo import MongoRepo
 from repo.repo import Repo
 from dotenv import load_dotenv
 
+run = True
+
 def runner(repo, csv_path):
     print("Reading " + csv_path)
 
@@ -20,7 +22,11 @@ def runner(repo, csv_path):
 
     with open(csv_path) as csv_file:
         reader = csv.reader(csv_file, delimiter=",")
+        global run
         for row in reader:
+            if not run:
+                repo.close()
+                return
             lat = float(row[0])
             long = float(row[1])
             speed = random.uniform(0.1, 4)
@@ -47,7 +53,6 @@ def generate_status(route_id, user_id, vehicle_id, speed, latitude, longitude):
 
 
 if __name__ == "__main__":
-
     if len(sys.argv) != 2:
         print("Expected 1 argument")
         exit(1)
@@ -73,13 +78,20 @@ if __name__ == "__main__":
 
     threadPool = []
 
-    for i in range(len(csvList)):
-        csv_path = os.path.join(dataDir, csvList[i])
-        t = threading.Thread(target=runner, args=(repo,csv_path))
-        threadPool.append(t)
-        t.start()
-        time.sleep(random.uniform(0.1,3))
+    try:
+        for i in range(len(csvList)):
+            csv_path = os.path.join(dataDir, csvList[i])
+            t = threading.Thread(target=runner, args=(repo,csv_path))
+            threadPool.append(t)
+            t.start()
+            time.sleep(random.uniform(0.1,3))
 
-    for thread in threadPool:
-        thread.join()
-
+        while True:
+            for thread in threadPool:
+                if not thread.is_alive():
+                    threadPool.remove(thread)
+                else:
+                    time.sleep(.5)
+    except KeyboardInterrupt:
+        print("Keyboard interrupt received. Shutting down threads")
+        run = False
