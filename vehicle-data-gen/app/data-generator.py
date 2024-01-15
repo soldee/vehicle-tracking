@@ -3,12 +3,10 @@ import os
 import csv
 import time
 import random
-import datetime
 import uuid
 import sys
 from repo.mqtt_repo import MqttRepo
 from repo.mongo_repo import MongoRepo
-from repo.repo import Repo
 from dotenv import load_dotenv
 
 run = True
@@ -32,24 +30,8 @@ def runner(repo, csv_path):
             speed = random.uniform(0.1, 4)
             print("{},{},{}".format(lat,long,speed))
 
-            repo.insert(record=generate_status(route_id, user_id, vehicle_id, speed, lat, long))
+            repo.insert_status(route_id, user_id, vehicle_id, speed, lat, long)
             time.sleep(5)
-
-
-def generate_status(route_id, user_id, vehicle_id, speed, latitude, longitude):
-    return {
-        'ts': datetime.datetime.now(), 
-        'meta': {
-            'route_id': route_id, 
-            'user_id': user_id, 
-            'vehicle_id': vehicle_id
-        }, 
-        'speed': speed, 
-        'location': {
-            'type': 'Point', 
-            'coordinates': [latitude, longitude]
-        }
-    }
 
 
 if __name__ == "__main__":
@@ -67,7 +49,16 @@ if __name__ == "__main__":
                 exit(1)
             repo = MongoRepo(mongo_uri)
         case "--mqtt":
-            repo = MqttRepo()
+            mqtt_broker = os.getenv("MQTT_BROKER")
+            mqtt_port = os.getenv("MQTT_PORT")
+            mqtt_username = os.getenv("MQTT_USERNAME")
+            mqtt_password = os.getenv("MQTT_PASSWORD")
+            mqtt_client_id = os.getenv("MQTT_CLIENT_ID")
+            if mqtt_broker == "" or mqtt_port == "" or mqtt_username == "" or mqtt_password == "" or mqtt_client_id == "":
+                print("MQTT_BROKER, MQTT_PORT, MQTT_USERNAME, MQTT_PASSWORD and MQTT_CLIENT_ID env variables are required to connect to MQTT broker")
+                exit(1)
+            
+            repo = MqttRepo(mqtt_broker, int(mqtt_port), mqtt_username, mqtt_password, mqtt_client_id)
         case _:
             print(f"Invalid argument provided for repo {sys.argv[0]}. Valid arguments are '--mongo' or '--mqtt'")
             exit(1)
