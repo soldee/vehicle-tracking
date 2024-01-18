@@ -1,6 +1,17 @@
 version: '3.6'
 services:
 
+  data-generator:
+    build:
+      context: ./vehicle-data-generator
+      dockerfile: Dockerfile
+    container_name: data-generator
+    networks:
+      - tracker-net
+    depends_on:
+      mqtt-broker:
+        condition: service_healthy
+
   mqtt-broker:
     build:
       context: ./mqtt-broker
@@ -8,6 +19,7 @@ services:
     container_name: mqtt-broker
     ports:
       - 1883:1883
+      - 15672:15672
     networks:
       - tracker-net
     healthcheck:
